@@ -7,6 +7,8 @@
 
 // priority task_name, new_priority;
 
+//HEJSAN JOEL <3<3<3
+
 task main()
 {
      SetSensor(IN_1, SENSOR_TOUCH); // Port 1, touch sensor
@@ -77,7 +79,7 @@ void findOpponent ()
            
            if (ccontinue==0)
            {
-              //funktion för att röra sig bort från kanten
+              //funktion fÃ¶r att rÃ¶ra sig bort frÃ¥n kanten
            }
       
      
@@ -91,7 +93,7 @@ void findOpponent ()
 
 void rotate360 ()
 {
-    OnFwd(OUT_A, POWERFOR360) //Nog power för att rotera 360 grader
+    OnFwd(OUT_A, POWERFOR360) //Nog power fÃ¶r att rotera 360 grader
     OnRev(OUT_B, POWERFOR360)
 }
 
