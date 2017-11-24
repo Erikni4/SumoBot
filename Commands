@@ -1,13 +1,48 @@
-//Duger inte nedanstående kan följande länk ge lite mer ingående info:
-//http://bricxcc.sourceforge.net/nbc/nxcdoc/NXC_tutorial.pdf
- 
-//Observera att nedanstående listad kod inte är en fullständig lista utan endast innehåller nyttiga exempel.
+Duger inte nedanstående kan följande länk ge lite mer ingående info:
+http://bricxcc.sourceforge.net/nbc/nxcdoc/NXC_tutorial.pdf
+
+Observera att nedanstående listad kod inte är en fullständig lista utan endast innehåller nyttiga exempel.
 
 //Allmänna tips:
 //Strängar skrivs med kommandot string istället för en array av chars.
 //Arrayer (kan?) initieras annorlunda, se nedan
 //Avstånd mäts i cm (tex. SensorUS(IN_4)>15   om ultraljudsensorn upptäcket föremål inom 15 cm
 //Tid mäts i milisekunder
+//Nya variabeltyper, se nedan
+
+//********************Task funktioner***********************
+
+//Taskfunktioner fungerar likt vanliga funktioner i C med skillnaden att flera kan köras samtidigt. De skrivs likt vanliga:
+
+task move_square()
+{
+ while (true)
+ {
+ Acquire(moveMutex);
+ OnFwd(OUT_AC, 75); Wait(1000);
+ OnRev(OUT_C, 75); Wait(500);
+ Release(moveMutex);
+ }
+}
+task check_sensors()
+{
+ while (true)
+ {
+ if (SENSOR_1 == 1)
+ {
+ Acquire(moveMutex);
+ OnRev(OUT_AC, 75); Wait(500);
+ OnFwd(OUT_A, 75); Wait(500);
+ Release(moveMutex);
+ }
+ }
+}
+
+//********************Variabeltypen mutex (mutual exclusion)
+
+//Acquire funktionen
+
+//Release funktionen
 
 
 //********************SENSORER******************************
@@ -34,8 +69,30 @@ SensorUS(IN_4); //Kommande för att använda ultraljudsesorn, se nedan.
 
 OnFwd(OUT_A, POWER) // Startar motor A som kör framåt i <POWER>% kapacitet
 OnRev(OUT_A, POWER) //Startar motor A som kör bakåt i <POWER>% kapacitet
-Off(OUT_A); // Stänger av motor A som slutar med nuvarande kommando. 
+Off(OUT_A); // Stänger av motor A som slutar med nuvarande kommando. Servomotorn stannar omedelbart samt att bromsar triggas
+Float(OUT_A); //Float() och Coast() ger mjukare inbromsning än Off() då endast strömmer kapas till motorn (vet ej skillnaden på dem).
+Coast(OUT_A);
 
+OnFwdReg(‘ports',‘speed',‘regmode') //drives the motors specified by ‘ports' at the ‘speed' power
+applying the regulation mode that can be either OUT_REGMODE_IDLE, OUT_REGMODE_SPEED or
+OUT_REGMODE_SYNC. If IDLE is selected, no PID regulation will be applied; if SPEED mode is selected, the
+NXT regulates single motor to get a constant speed, even if load on motor varies; finally, if SYNC is selected,
+the couple of motors specified by ‘ports' move in sync as explained before.
+// Tex. OnFwdReg(OUT_AC,50,OUT_REGMODE_SYNC);
+OnRevReg(‘ports',‘speed',‘regmode') //Samma som ovanstående fast bakåt
+
+OnFwdSync(‘ports',‘speed',‘turnpct') //is the same as OnFwdReg() command in SYNC mode, but
+//now you can also specify the 'turnpct' steering percentual (from -100 to 100).
+OnRevSync(‘ports',‘speed',‘turnpct') //is the same as before, simply reversing the motor's direction. 
+
+RotateMotor(‘ports',‘speed',‘degrees') //rotates the motor shaft specified by ‘ports' by a ‘degrees'
+//angle at ‘speed' power (in 0-100 range). Tex. RotateMotor(OUT_AC, 50,360);
+
+RotateMotorEx(‘ports',‘speed',‘degrees',‘turnpct',‘sync', 'stop') //is an extension of the
+//precedent command, that lets you synchronize two motors (e.g. OUT_AC) specifying a ‘turnpct' steering
+//percentage (from -100 to 100) and a boolean flag ‘sync' (that can be set to true or false). It also lets you
+//specify whether the motors should brake after the angle of rotation has completed using the boolean flag 'stop'.
+// Till exempel RotateMotorEx(OUT_AC, 50, 360, 0, true, true);
 
 //*********************MISC************************
 
