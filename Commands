@@ -1,7 +1,7 @@
-Duger inte nedanstående kan följande länk ge lite mer ingående info:
-http://bricxcc.sourceforge.net/nbc/nxcdoc/NXC_tutorial.pdf
-
-Observera att nedanstående listad kod inte är en fullständig lista utan endast innehåller nyttiga exempel.
+//Duger inte nedanstående kan följande länk ge lite mer ingående info:
+//http://bricxcc.sourceforge.net/nbc/nxcdoc/NXC_tutorial.pdf
+ 
+//Observera att nedanstående listad kod inte är en fullständig lista utan endast innehåller nyttiga exempel.
 
 //Allmänna tips:
 //Strängar skrivs med kommandot string istället för en array av chars.
