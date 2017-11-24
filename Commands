@@ -1,2 +1,81 @@
-OnFwd(OUT_A, POWER) // Motor A kör framåt i <POWER>% kapacitet
-OnRev(OUT_A, POWER) //Motor A kör bakåt i <POWER>% kapacitet
+Duger inte nedanstående kan följande länk ge lite mer ingående info:
+http://bricxcc.sourceforge.net/nbc/nxcdoc/NXC_tutorial.pdf
+
+Observera att nedanstående listad kod inte är en fullständig lista utan endast innehåller nyttiga exempel.
+
+//Allmänna tips:
+//Strängar skrivs med kommandot string istället för en array av chars.
+//Arrayer (kan?) initieras annorlunda, se nedan
+//Avstånd mäts i cm (tex. SensorUS(IN_4)>15   om ultraljudsensorn upptäcket föremål inom 15 cm
+//Tid mäts i milisekunder
+
+
+//********************SENSORER******************************
+
+//En touch sensor har värdet 1 om den är intryckts, annars 0.
+
+SetSensor(IN_1, SENSOR_TOUCH); // Anger att en "touch sensor" sitter i Port 1
+SetSensorTouch(IN_1); //Samma effekt som ovanstående rad, men fungerar endast för trycksensorerna
+SENSOR_1 // sensorn i port 1 (tex. while(SENSOR_1==0))
+ResetSensor(IN_3);
+SetSensorLowspeed(IN_4); //För ultraljudsensorn
+SensorUS(IN_4); //Kommande för att använda ultraljudsesorn, se nedan.
+//Ultraljudsensorn kan avgöra avståendet till föremål. Följande exempel visar en while-loop som blir sann om sensorn detekterar ett
+//föremål inom 15 cm.
+ while(SensorUS(IN_4)>15);
+ Off(OUT_AC);
+ OnRev(OUT_C,100);
+ Wait(800);
+ }
+
+//********************MOTORER*******************************
+
+// Flera motorer kan anges i samma kommando, tex. OnFwd(OUT_ABC, POWER)
+
+OnFwd(OUT_A, POWER) // Startar motor A som kör framåt i <POWER>% kapacitet
+OnRev(OUT_A, POWER) //Startar motor A som kör bakåt i <POWER>% kapacitet
+Off(OUT_A); // Stänger av motor A som slutar med nuvarande kommando. 
+
+
+//*********************MISC************************
+
+Random(x); //Ger ett random tal mellan 0 och x.
+
+Wait(TIME); //Pågående program väntar (blir vilande) i <TIME> tid angett i millisekunder. Nuvarande kommandon fortsätter vara aktiva under
+//<TIME>
+
+//Exempel:
+//Följande kod låter roboten köra frammåt i 3 sekunder med 75% kapacitet och stänger därefter av motorerna .
+OnFwd(OUT_AB, 75);
+Wait(3000);
+Off(OUT_AB);
+
+//******************repeat() statement**********************
+
+ repeat(x) //Koden innanför brackets repeteras x antal gånger. Kan användas istället för for-loop.
+ {
+ OnFwd(OUT_AC, 75);
+ Wait(MOVE_TIME);
+ OnRev(OUT_C, 75);
+ Wait(TURN_TIME);
+ }
+ 
+ //******************Arrays********************************
+ 
+ //Initiera en array på följande sätt:
+ 
+ int values[]; //Deklarerar en ny array
+ ArrayInit(values, 0, 10); //Initierar arrayen values med 0 i 10 element.
+ // Arrayen ser nu alltså ut på följande sätt: values[10]={0,0,0,0,0,0,0,0,0,0};
+ 
+ //*******************until() statement*****************
+ 
+ // Liknande till Wait, programmet väntar tills tillståndet i until blir sant.
+ 
+ //Exempel:
+ //Följande kod startar motorn A på 50% och kör motorn tills tryckssensorn i port 1 trycks in. När den tryckts in ökas istället kraften
+ //till 100%
+ OnFwd(OUT_A, 50);
+ until(SENSOR_1 == 1);
+ OnFwd(OUT_A, 100);
+ 
