@@ -1,1 +1,2 @@
 OnFwd(OUT_A, POWER) // Motor A kör framåt i <POWER>% kapacitet
+OnRev(OUT_A, POWER) //Motor A kör bakåt i <POWER>% kapacitet
