@@ -30,13 +30,17 @@ task main()
         while(blackLineFound!=1)
         {
            blackLineFound=searchForBlackLine();
+           if(blackLineFound)
+           {
+                break;
+           }
            turnLeft();
            turnRight();
            rotate360();
            TriggeredTouchSensor();
            moveFwd();
         }
-     if (blackLineFound==1)
+     if (blackLineFound)
      {
         OnFwdReg(OUT_AB,50,OUT_REGMODE_SYNC);
         Wait(1000);
