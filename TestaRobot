@@ -1,0 +1,154 @@
+#define POWER 60
+#define MAXPOWER 100
+
+// RIGHT ENGINE = A
+// LEFT ENGINE = B
+// TOP ENGINE = C
+
+int searchForBlackLine ();
+//void findOpponent ();
+void moveFwd ();
+void rotate360 ();
+void turnLeft ();
+void turnRight ();
+void TriggeredTouchSensor ();
+
+task main()
+{
+
+     int blackLineFound=0;
+
+     SetSensor(IN_1, SENSOR_TOUCH); // Port 1, touch sensor
+     SetSensor(IN_2, SENSOR_TOUCH);
+     SetSensorLowspeed(IN_3);       //Ultraljud
+     SetSensorColorFull(IN_4);      //Färgsensorn?
+
+
+
+       RotateMotor(OUT_C, 10, 10);
+       RotateMotor(OUT_C, 10, -10);
+        while(blackLineFound!=1)
+        {
+           blackLineFound=searchForBlackLine();
+           turnLeft();
+           turnRight();
+           rotate360();
+           TriggeredTouchSensor();
+           moveFwd();
+        }
+     if (blackLineFound==1)
+     {
+        OnFwdReg(OUT_AB,50,OUT_REGMODE_SYNC);
+        Wait(1000);
+     }
+
+} // End task main
+
+
+int searchForBlackLine ()
+{
+     int val, colorValue, r[], n[], s[];
+     string colorName;
+
+     ReadSensorColorEx(S3, colorValue, r, n, s);
+
+
+
+
+     switch(colorValue)
+     {
+        case INPUT_BLACKCOLOR:
+            colorName = "Black";
+            break;
+        case INPUT_BLUECOLOR:
+            colorName = "Blue";
+            break;
+        case INPUT_GREENCOLOR:
+            colorName = "Green";
+            break;
+        case INPUT_REDCOLOR:
+            colorName = "Yellow";
+            break;
+        case INPUT_WHITECOLOR:
+            colorName = "White";
+            break;
+        default:
+            colorName = "Unknown";
+     }
+
+     if (strcmp(colorName, "Black")==0)
+     {
+          val=1;
+     }
+     else
+     {
+          val=0;
+     }
+
+
+  return val;
+}
+
+
+
+/*void findOpponent ()
+{
+     while (SensorUS(IN_3) !=1) // While soundsensor in port 3 not reacts to sound
+     {
+           int ccontinue=searchForBlackLine(); //Om svart linje hittas returneras 1
+           while (ccontinue!=1)
+           {
+
+                 rotate360();
+                 OnRev(OUT_AB, POWER); //Engine A and B set to reverse
+
+
+           }
+
+           if (ccontinue)
+           {
+              //funktion för att röra sig bort från kanten
+           }
+     }
+}*/
+
+void moveFwd ()
+{
+    OnFwdReg(OUT_AB, 50, OUT_REGMODE_SYNC);
+    Wait(500);
+    Off(OUT_AB);
+}
+
+void rotate360 ()
+{
+    RotateMotorEx(OUT_AB, 100, 360, 0, true, true);
+}
+
+void turnLeft ()
+{
+    RotateMotorEx(OUT_AB, 100, -90, 0, true, true);
+
+}
+
+void turnRight ()
+{
+     RotateMotorEx(OUT_AB, 100, 90, 0, true, true);
+
+}
+
+
+
+
+void TriggeredTouchSensor ()
+{
+
+//while(true)   // ändra till while(true) i task system
+     //{
+          // Wait until touch sensor pressed
+          while(SENSOR_1 != 1 || SENSOR_2 != 1)
+          {
+                RotateMotor(OUT_C, 100, 10);
+          }
+     //}
+
+}
