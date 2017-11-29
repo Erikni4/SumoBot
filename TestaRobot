@@ -1,48 +1,60 @@
 #define POWER 60
 #define MAXPOWER 100
 
-// RIGHT ENGINE = A
+// RIGHT ENGINE = C
 // LEFT ENGINE = B
-// TOP ENGINE = C
+// TOP ENGINE = A
 
 int searchForBlackLine ();
 //void findOpponent ();
 void moveFwd ();
-void rotate360 ();
-void turnLeft ();
-void turnRight ();
+task turn90LeftE ();
+task turn90RightE ();
+task turnMin90LeftE ();
+task turnMin90RightE ();
 void TriggeredTouchSensor ();
+task Rotate360RightE ();
+task Rotate360LeftE ();
+task findOpponent ();
+task moveWhileSearch ();
+task searchOpponent ();
+
+// TODO
+// switch-sats som använder alla sensorerna
+
 
 task main()
 {
 
      int blackLineFound=0;
 
-     SetSensor(IN_1, SENSOR_TOUCH); // Port 1, touch sensor
-     SetSensor(IN_2, SENSOR_TOUCH);
-     SetSensorLowspeed(IN_3);       //Ultraljud
-     SetSensorColorFull(IN_4);      //Färgsensorn?
+     SetSensor(IN_2, SENSOR_TOUCH); // Port 1, touch sensor
+     SetSensor(IN_1, SENSOR_TOUCH);
+     SetSensorLowspeed(IN_4);       //Ultraljud
+     SetSensorColorFull(IN_3);      //Färgsensorn
 
 
 
-       RotateMotor(OUT_C, 10, 10);
-       RotateMotor(OUT_C, 10, -10);
+       Precedes(findOpponent, moveWhileSearch); //En funktion kontrollerar US, en rör roboten
+
+       //RotateMotor(OUT_A, 10, 10);
+       //RotateMotor(OUT_A, 10, -10);
         while(blackLineFound!=1)
         {
-           blackLineFound=searchForBlackLine();
+          blackLineFound=searchForBlackLine();
            if(blackLineFound)
            {
                 break;
            }
-           turnLeft();
-           turnRight();
-           rotate360();
-           TriggeredTouchSensor();
-           moveFwd();
+           Precedes(turnMin90LeftE, turnMin90RightE); //Svänger vänster
+           Precedes(turn90LeftE, turn90RightE);   //Svänger höger
+           Precedes(Rotate360LeftE, Rotate360RightE);
+           //TriggeredTouchSensor();
+           //moveFwd();
         }
      if (blackLineFound)
      {
-        OnFwdReg(OUT_AB,50,OUT_REGMODE_SYNC);
+        OnFwdReg(OUT_BC,100,OUT_REGMODE_SYNC);
         Wait(1000);
      }
 
@@ -83,6 +95,8 @@ int searchForBlackLine ()
      if (strcmp(colorName, "Black")==0)
      {
           val=1;
+          //RotateMotorEx(OUT_BC, 100, 3700, 100, true, false);
+          //Wait(2000);
      }
      else
      {
@@ -93,51 +107,89 @@ int searchForBlackLine ()
   return val;
 }
 
+task searchOpponent ()
+{
+     Precedes(findOpponent, moveWhileSearch);
+}
 
+
+task findOpponent ()
+{
+     while (SensorUS(IN_4)<20)
+     OnFwdReg(OUT_BC, 100, OUT_REGMODE_SYNC);
+
+}
+
+task moveWhileSearch ()
+{
+     Precedes(Rotate360LeftE, Rotate360RightE);
+
+}
 
 /*void findOpponent ()
 {
-     while (SensorUS(IN_3) !=1) // While soundsensor in port 3 not reacts to sound
-     {
+     while (SensorUS(IN_4) !=1) // While soundsensor in port 3 not reacts to sound
+     {                          //Kan ändras till tex <15 cm
            int ccontinue=searchForBlackLine(); //Om svart linje hittas returneras 1
            while (ccontinue!=1)
            {
 
-                 rotate360();
-                 OnRev(OUT_AB, POWER); //Engine A and B set to reverse
+                 Precedes(Rotate360Left, Rotate360Right);
+                 OnRev(OUT_AB, 100); //Engine A and B set to reverse
 
 
            }
 
            if (ccontinue)
            {
-              //funktion för att röra sig bort från kanten
+               OnFwdReg(OUT_BC,100,OUT_REGMODE_SYNC);
+               Wait(1000);
            }
      }
-}*/
+} */
+
+
+task Rotate360LeftE ()
+{
+   OnRev(OUT_B, 100);
+   Wait(2670);
+}
+
+task Rotate360RightE ()
+{
+   OnFwd(OUT_C, 100);
+   Wait(2670);
+}
 
 void moveFwd ()
 {
-    OnFwdReg(OUT_AB, 50, OUT_REGMODE_SYNC);
-    Wait(500);
-    Off(OUT_AB);
+    OnRevReg(OUT_BC, 100, OUT_REGMODE_SYNC);
+    Wait(1000);
+    Off(OUT_BC);
 }
 
-void rotate360 ()
+task turn90LeftE () //Svänger höger
 {
-    RotateMotorEx(OUT_AB, 100, 360, 0, true, true);
+    OnFwd(OUT_B, 100);
+    Wait(675); //Testa tid för att få rätt sväng
 }
 
-void turnLeft ()
+task turn90RightE () //Svänger höger
 {
-    RotateMotorEx(OUT_AB, 100, -90, 0, true, true);
-
+     OnFwd(OUT_C, 100);
+     Wait(675); //Testa tid för att få rätt sväng
 }
 
-void turnRight ()
+task turnMin90LeftE () //Svänger vänster
 {
-     RotateMotorEx(OUT_AB, 100, 90, 0, true, true);
+    OnFwd(OUT_B, 100);
+    Wait(675); //Testa tid för att få rätt sväng
+}
 
+task turnMin90RightE () //Svänger vänster
+{
+    OnRev(OUT_C, 100);
+    Wait(675); //Testa tid för att få rätt sväng
 }
 
 
@@ -149,9 +201,9 @@ void TriggeredTouchSensor ()
 //while(true)   // ändra till while(true) i task system
      //{
           // Wait until touch sensor pressed
-          while(SENSOR_1 != 1 || SENSOR_2 != 1)
+          while(SENSOR_1 || SENSOR_2)   //SENSOR_1 != 1 || SENSOR_2 != 1
           {
-                RotateMotor(OUT_C, 100, 10);
+                RotateMotor(OUT_A, 100, -15);
           }
      //}
 
