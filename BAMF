@@ -2,7 +2,6 @@
 // LEFT ENGINE = B
 // TOP ENGINE = A
 
-
 // TODO
 //Endast en Precedes i programmet?
 //Alternativa funktioner till readsensorcolorex
@@ -14,13 +13,24 @@ task moveToFindOpponent ();
 int checkSensors ();
 int searchForBlackLine ();
 
+
+
+
+
+// RIGHT ENGINE =C
+// LEFT ENGINE = B
+// TOP ENGINE = A
+
+void fullSpeedForward();
+void lift();
+
 mutex moveMutex; //JA DET ÄR EN GLOBAL VARIABEL! SO WHAT?!
 
 task main()
 {
      SetSensor(IN_2, SENSOR_TOUCH); // Port 1, touch sensor
      SetSensor(IN_1, SENSOR_TOUCH);
-     SetSensorLowspeed(IN_4);       //Ultraljud
+     SetSensorLowspeed(IN_4);       //Ultraljud, varför används inte SetSensorUltrasonic(IN_4); ???
      SetSensorColorFull(IN_3);      //Färgsensorn
 
      //Roboten ska vara inaktiv i 3 sec
@@ -50,7 +60,7 @@ task UseSensors ()
          else if(val==2)
          {
               Acquire(moveMutex);
-              //Funktion för att attackera
+              fullSpeedForward();
               //Eriks funktion för att attackera, plogen osv
 
               Off(OUT_BC); //US triggas: kommando för att få roboten att stanna, Off(OUT_BC)??
@@ -77,6 +87,50 @@ task moveToFindOpponent ()
 {
 
 
+}
+
+void fullSpeedForward()  // function av Erik
+{
+
+  bool foundEnemy=true;
+
+  while(foundEnemy)
+  {
+
+        //the ultrasonic sensor needs time to read the values
+        //that is why we have the 500 millisecond wait
+        //
+        Wait(500);
+        if(SensorUS(IN_4) < 30)
+        {
+            OnFwd(OUT_BC, 100);
+            Wait(500);
+            RotateMotor(OUT_A,10,30);
+            Wait(200);
+            lift();
+        }
+        else if(SensorUS(IN_4) < 250)
+        {
+            OnFwd(OUT_BC, 100);
+            Wait(500);
+            RotateMotor(OUT_A,-10,30);
+            Wait(200);
+        }
+        else
+        {
+            OnFwd(OUT_BC, 100);
+            foundEnemy=false;
+        }
+  }
+}
+
+void lift()  // Funktion av Erik,
+{
+   if(SENSOR_1 == 1 || SENSOR_2 == 1)
+          {
+                RotateMotor(OUT_A, 100, -15);
+                Wait(5000);
+          }
 }
 
 int checkSensors ()
