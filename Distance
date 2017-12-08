@@ -1,0 +1,28 @@
+
+void CalcDistance;
+{
+	int ReadUltrasonic1;
+	int ReadUltrasonic2;
+	int distanceDiffrence;
+	int t1;
+	
+	t1=CurrentTick();
+	ReadUltrasonic1=SensorUS(S4);
+	untill(CurrentTick-t1>250);
+	ReadUltrasonic2=SensorUS(S4);
+
+	distanceDiffrence=ReadUltrasonic1-ReadUltrasonic2;
+	
+	if(distanceDiffrence > 0)
+	{
+		TextOut(20,20,"Distance closes");
+	}
+	else if (distanceDiffrence < 0)
+	{
+		TextOut(20,20,"Distance increses");
+	}
+	else (distanceDiffrence < 0)
+	{
+		TextOut(20,20,"Same Distance");
+	}	
+}
